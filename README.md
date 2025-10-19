@@ -33,10 +33,9 @@ pnpm install
 4. Add envronment variables
 
 ```bash
-OPENAI_API_KEY=""
+GROQ_API_KEY=""
 TURSO_DATABASE_URL=""
 TURSO_AUTH_TOKEN=""
-PERPLEXITY_API_KEY=""
 ```
 
 5. Run seed command (make sure you have bun installed)

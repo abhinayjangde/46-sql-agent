@@ -1,6 +1,7 @@
 import { db } from "@/db/db";
 // import { openai } from "@ai-sdk/openai";
-import { perplexity } from "@ai-sdk/perplexity";
+// import { perplexity } from "@ai-sdk/perplexity";
+import { groq } from "@ai-sdk/groq";
 import {
   streamText,
   UIMessage,
@@ -39,7 +40,8 @@ export async function POST(req: Request) {
 
   const result = streamText({
     // model: openai("gpt-5-nano"),
-    model: perplexity("sonar-pro"),
+    // model: perplexity("sonar-pro"),
+    model: groq("openai/gpt-oss-120b"),
     messages: convertToModelMessages(messages),
     system: SYSTEM_PROMPT,
     stopWhen: stepCountIs(5),
@@ -77,7 +79,6 @@ export async function POST(req: Request) {
             .describe("The SQL query to execute on the database."),
         }),
         execute: async ({ query }) => {
-          console.log("Executing database query:", query);
           // use gaurdrails to allow only SELECT queries
           return await db.run(query);
         },
