@@ -10,23 +10,33 @@ export default function Chat() {
     <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
       {messages.map((message) => (
         <div key={message.id} className="whitespace-pre-wrap">
-          {message.role === "user" ? "User: " : "AI: "}
+          {message.role === "user" ? "👤: " : "🤖: "}
           {message.parts.map((part, i) => {
             switch (part.type) {
               case "text":
-                return <div key={`${message.id}-${i}`}>{part.text}</div>;
-              // case "tool-db":
-              //   return (
-              //     <pre key={`${message.id}-${i}`}>
-              //       {JSON.stringify(part, null, 2)}
-              //     </pre>
-              //   );
-              // case "tool-schema":
-              //   return (
-              //     <pre key={`${message.id}-${i}`}>
-              //       {JSON.stringify(part, null, 2)}
-              //     </pre>
-              //   );
+                return (
+                  <div className="" key={`${message.id}-${i}`}>
+                    {part.text}
+                  </div>
+                );
+              case "tool-db":
+                return (
+                  <div
+                    className="border my-1 rounded-xl px-2 w-fit "
+                    key={`${message.id}-${i}`}
+                  >
+                    Tool Calling...
+                  </div>
+                );
+              case "tool-schema":
+                return (
+                  <div
+                    className="border rounded-xl px-2 w-fit "
+                    key={`${message.id}-${i}`}
+                  >
+                    Tool Calling...
+                  </div>
+                );
             }
           })}
         </div>
