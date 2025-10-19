@@ -1,5 +1,12 @@
+import { db } from "@/db/db";
 import { openai } from "@ai-sdk/openai";
-import { streamText, UIMessage, convertToModelMessages, tool } from "ai";
+import {
+  streamText,
+  UIMessage,
+  convertToModelMessages,
+  tool,
+  stepCountIs,
+} from "ai";
 import { z } from "zod";
 
 // Allow streaming responses up to 30 seconds
@@ -25,7 +32,33 @@ export async function POST(req: Request) {
     model: openai("gpt-5-nano"),
     messages: convertToModelMessages(messages),
     system: SYSTEM_PROMPT,
+    stopWhen: stepCountIs(5),
     tools: {
+      schema: tool({
+        description: "Call this tool to get the database schema information.",
+        inputSchema: z.object({}),
+        execute: async () => {
+          return `CREATE TABLE products (
+                    id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    name text NOT NULL,
+                    category text NOT NULL,
+                    price real NOT NULL,
+                    stock integer DEFAULT 0 NOT NULL,
+                    created_at text DEFAULT CURRENT_TIMESTAMP
+                  );
+
+                CREATE TABLE sales (
+                  id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+                  product_id integer NOT NULL,
+                  quantity integer NOT NULL,
+                  total_amount real NOT NULL,
+                  sale_date text DEFAULT CURRENT_TIMESTAMP,
+                  customer_name text NOT NULL,
+                  region text NOT NULL,
+                  FOREIGN KEY (product_id) REFERENCES products(id) ON UPDATE no action ON DELETE no action
+                );`;
+        },
+      }),
       db: tool({
         description: "Call this tool to query the database.",
         inputSchema: z.object({
@@ -35,14 +68,8 @@ export async function POST(req: Request) {
         }),
         execute: async ({ query }) => {
           console.log("Executing database query:", query);
-          // Simulate a database query execution
-          const fakeDatabaseResponse = {
-            rows: [
-              { id: 1, name: "Alice" },
-              { id: 2, name: "Bob" },
-            ],
-          };
-          return JSON.stringify(fakeDatabaseResponse);
+          // use gaurdrails to allow only SELECT queries
+          return await db.run(query);
         },
       }),
     },
