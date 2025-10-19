@@ -9,3 +9,5 @@ techstack
 - drizzle orm
 - openai api
 - pnpm
+
+## Local Developmnet Setup

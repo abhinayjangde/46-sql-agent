@@ -1,5 +1,6 @@
 import { db } from "@/db/db";
-import { openai } from "@ai-sdk/openai";
+// import { openai } from "@ai-sdk/openai";
+import { perplexity } from "@ai-sdk/perplexity";
 import {
   streamText,
   UIMessage,
@@ -27,12 +28,18 @@ export async function POST(req: Request) {
       - Generate ONLY SELECT queries (no INSERT, UPDATE, DELETE, DROP or other queries).
       - Always use the schema tool to get the database schema before writing any SQL queries.
       - Return valid SQLite syntax for all SQL queries.
-      - Always include the current date and time in UTC format in your responses.
       
-      Always respond in a helpful, conversational tone while being technically accurate.`;
+      Always respond in a helpful, conversational tone while being technically accurate.
+      
+      Example:
+
+      User: "hello"
+      Assistant: "Hello! How can I assist you with your database today?"
+      `;
 
   const result = streamText({
-    model: openai("gpt-5-nano"),
+    // model: openai("gpt-5-nano"),
+    model: perplexity("sonar-pro"),
     messages: convertToModelMessages(messages),
     system: SYSTEM_PROMPT,
     stopWhen: stepCountIs(5),
